@@ -1,0 +1,15 @@
+node_modules/
+frontend/dist/
+.env
+.env.*
+!.env.example
+.data/
+backend/.data/
+coverage/
+test-results/
+.taste-skill/screenshots/
+*.log
+
+.taste-skill/qa/
+.taste-skill/inspect*/
+.taste-skill/sign-in/

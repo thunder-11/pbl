@@ -1,0 +1,214 @@
+[
+  {
+    "code": "2301212",
+    "title": "Data Structures",
+    "year": "SY",
+    "semester": 4,
+    "units": [
+      {
+        "number": 1,
+        "title": "Introduction to Data Structures and Algorithms",
+        "source": "SY p42",
+        "topics": [
+          "Foundations and sorting methods",
+          "Linear Search",
+          "Binary Search",
+          "Bubble Sort",
+          "Selection Sort",
+          "Insertion Sort",
+          "Merge Sort"
+        ]
+      },
+      {
+        "number": 2,
+        "title": "Multidimensional Arrays and Memory Representation",
+        "source": "SY p42",
+        "topics": [
+          "Arrays, polynomials, sparse matrices and strings"
+        ]
+      },
+      {
+        "number": 3,
+        "title": "Linked Lists",
+        "source": "SY p43",
+        "topics": [
+          "Linked Lists"
+        ]
+      },
+      {
+        "number": 4,
+        "title": "Stack & Queue",
+        "source": "SY p43",
+        "topics": [
+          "Stack",
+          "Queue"
+        ]
+      },
+      {
+        "number": 5,
+        "title": "Hashing",
+        "source": "SY p43",
+        "topics": [
+          "Hashing"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "2301301",
+    "title": "Data Structures and Algorithms",
+    "year": "TY",
+    "semester": 5,
+    "units": [
+      {
+        "number": 1,
+        "title": "Algorithm Analysis and Graph Algorithms",
+        "source": "TY p3",
+        "topics": [
+          "Algorithm analysis",
+          "Graph representations and connectivity",
+          "Breadth-First Search",
+          "Depth-First Search",
+          "Minimum spanning trees"
+        ]
+      },
+      {
+        "number": 2,
+        "title": "Trees",
+        "source": "TY p3",
+        "topics": [
+          "General and binary trees",
+          "Binary Search Tree",
+          "Threaded and expression trees"
+        ]
+      },
+      {
+        "number": 3,
+        "title": "Symbol table, indexing and multiway tree",
+        "source": "TY p3",
+        "topics": [
+          "Symbol tables and AVL trees",
+          "Multiway trees and indexing",
+          "Heaps"
+        ]
+      },
+      {
+        "number": 4,
+        "title": "Greedy And Dynamic Programming algorithmic Strategy",
+        "source": "TY p4",
+        "topics": [
+          "Greedy strategy",
+          "Dynamic programming"
+        ]
+      },
+      {
+        "number": 5,
+        "title": "Backtracking and Branch and Bound",
+        "source": "TY p4",
+        "topics": [
+          "Backtracking",
+          "Branch and bound"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "2311302",
+    "title": "Artificial Intelligence",
+    "year": "TY",
+    "semester": 5,
+    "units": [
+      {
+        "number": 1,
+        "title": "Introduction of Artificial Intelligence",
+        "source": "TY p5",
+        "topics": [
+          "AI foundations and agents"
+        ]
+      },
+      {
+        "number": 2,
+        "title": "Problem Solving using Search Techniques",
+        "source": "TY p5",
+        "topics": [
+          "Uninformed search",
+          "Heuristic search",
+          "Local search and optimization"
+        ]
+      },
+      {
+        "number": 3,
+        "title": "Adversarial search",
+        "source": "TY p5",
+        "topics": [
+          "Games and adversarial search",
+          "Constraint satisfaction problems"
+        ]
+      },
+      {
+        "number": 4,
+        "title": "Logical Reasoning",
+        "source": "TY p5",
+        "topics": [
+          "Logical reasoning"
+        ]
+      },
+      {
+        "number": 5,
+        "title": "Knowledge Representation and Planning",
+        "source": "TY p5",
+        "topics": [
+          "Knowledge representation and planning"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "2301303",
+    "title": "Database Management Systems",
+    "year": "TY",
+    "semester": 5,
+    "units": [
+      {
+        "number": 1,
+        "title": "Relational Model and SQL",
+        "source": "TY p7",
+        "topics": [
+          "Relational model and SQL"
+        ]
+      },
+      {
+        "number": 2,
+        "title": "Advanced SQL and PLSQL",
+        "source": "TY p7",
+        "topics": [
+          "Advanced SQL and PLSQL"
+        ]
+      },
+      {
+        "number": 3,
+        "title": "Database Design: Entity-Relationship Model and Relational Database Design",
+        "source": "TY p7",
+        "topics": [
+          "ER modeling and normalization"
+        ]
+      },
+      {
+        "number": 4,
+        "title": "NO SQL Database",
+        "source": "TY pp7–8",
+        "topics": [
+          "Database architecture and NoSQL"
+        ]
+      },
+      {
+        "number": 5,
+        "title": "Transaction Management",
+        "source": "TY p8",
+        "topics": [
+          "Transaction management"
+        ]
+      }
+    ]
+  }
+]
