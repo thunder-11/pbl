@@ -1,6 +1,14 @@
-# Trace design notes
+# Cerebro design notes
 
 Both Anthropic frontend-design and design-taste-frontend informed this application. Taste draw: framed-sheet, seed191100531, no redraws.
+
+## Motion and color revision
+
+The user requested more motion and color. The existing frame, typography and layout remain; the palette now uses a cooler #f3f7fa ground, #116d81 action teal, #e2f1f8 for the current comparison, #fff6df for writes and #def4e8 for found/visited values. Workflow colors distinguish learning stages. Motion explains a change: array values move from their previous positions (including duplicate-value occurrence keys), tree nodes transition between positions, graph colors reveal visits, and state messages/counters confirm each step. A single workspace entrance and short activity transition support navigation; controls respond on press. No decorative infinite animation is used. CSS and Web Animations both honor reduced-motion preferences.
+
+Simulators create/start their session on opening, advance every 1200ms divided by the selected speed, pause at pending predictions, and resume after an answer or skip. Answer feedback is held for at least 3.5 seconds before advancing. Explicit pause stops playback; reset returns to a paused first state. Completed historical attempts remain completed. Unsupported activities are omitted from both tabs and workflow.
+
+`npm run test:motion` verifies automatic start/advance, pause/reset, actual value-position animation, prediction pauses/resumption, unavailable sections/deep links and reduced motion. Existing browser journeys also cover the revised automatic flow.
 
 ## Product and data inventory
 

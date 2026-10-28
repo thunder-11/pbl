@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import {
@@ -32,7 +32,7 @@ export function TopicPage() {
     { user } = useAuth(),
     [params, setParams] = useSearchParams(),
     topic = byId.get(topicId),
-    activity = params.get('activity') || 'understand',
+    requestedActivity = params.get('activity') || 'understand',
     [resources, setResources] = useState(null),
     [error, setError] = useState(null),
     [busy, setBusy] = useState(false),
@@ -57,7 +57,8 @@ export function TopicPage() {
       ['simulate', 'Simulate & predict', topic.availability.simulate],
       ['assess', 'Concept check', topic.availability.assess],
       ['code', 'Implement', topic.availability.code],
-    ];
+    ].filter(([, , available]) => available),
+    activity = tabs.some(([key]) => key === requestedActivity) ? requestedActivity : tabs[0]?.[0];
   const read = async (id) => {
     setBusy(true);
     setError(null);
@@ -92,151 +93,187 @@ export function TopicPage() {
           )
         }
       />
-      {user.role === 'STUDENT' && <WorkflowStrip progress={progress} />}
-      <div className="tabs" role="tablist" aria-label="Learning activities">
-        {tabs.map(([key, title, available]) => (
-          <button
-            role="tab"
-            aria-selected={activity === key}
-            key={key}
-            className={activity === key ? 'active' : ''}
-            onClick={() => setParams({ activity: key })}
-          >
-            {title}
-            {!available && <span className="tab-unavailable">Unavailable</span>}
-          </button>
-        ))}
-      </div>
-      <ErrorBox error={error} />
-      {notice && activity === 'understand' && (
-        <p className="success-message" role="status">
-          {notice}
-        </p>
+      {user.role === 'STUDENT' && tabs.length > 0 && (
+        <WorkflowStrip progress={progress} availability={topic.availability} />
       )}
-      {activity === 'understand' &&
-        (resources === null ? (
-          <Loading />
-        ) : resources.length ? (
-          <div className="reading-layout">
-            <article className="reading-content">
-              {resources.map((resource) => (
-                <section key={resource.id}>
-                  <Markdown
-                    components={{
-                      h1: ({ children }) => <h2>{children}</h2>,
-                      h2: ({ children }) => <h3>{children}</h3>,
-                      h3: ({ children }) => <h4>{children}</h4>,
-                    }}
-                  >
-                    {resource.content}
-                  </Markdown>
-                  {resource.referenceUrl && (
-                    <a href={resource.referenceUrl} target="_blank" rel="noreferrer">
-                      Reference material
-                    </a>
-                  )}
-                  {user.role === 'STUDENT' && (
-                    <div className="reading-actions">
-                      <button
-                        className="button primary"
-                        disabled={busy}
-                        onClick={() => read(resource.id)}
-                      >
-                        <Check size={16} />
-                        Mark as read
-                      </button>
-                      {topic.availability.simulate && (
+      {tabs.length > 0 && (
+        <div className="tabs" role="tablist" aria-label="Learning activities">
+          {tabs.map(([key, title]) => (
+            <button
+              role="tab"
+              aria-selected={activity === key}
+              key={key}
+              className={activity === key ? 'active' : ''}
+              onClick={() => setParams({ activity: key })}
+            >
+              {title}
+            </button>
+          ))}
+        </div>
+      )}
+      {!tabs.length && (
+        <Empty>Learning activities have not yet been published for this syllabus topic.</Empty>
+      )}
+      <div className="activity-panel" key={activity}>
+        <ErrorBox error={error} />
+        {notice && activity === 'understand' && (
+          <p className="success-message" role="status">
+            {notice}
+          </p>
+        )}
+        {activity === 'understand' &&
+          (resources === null ? (
+            <Loading />
+          ) : resources.length ? (
+            <div className="reading-layout">
+              <article className="reading-content">
+                {resources.map((resource) => (
+                  <section key={resource.id}>
+                    <Markdown
+                      components={{
+                        h1: ({ children }) => <h2>{children}</h2>,
+                        h2: ({ children }) => <h3>{children}</h3>,
+                        h3: ({ children }) => <h4>{children}</h4>,
+                      }}
+                    >
+                      {resource.content}
+                    </Markdown>
+                    {resource.referenceUrl && (
+                      <a href={resource.referenceUrl} target="_blank" rel="noreferrer">
+                        Reference material
+                      </a>
+                    )}
+                    {user.role === 'STUDENT' && (
+                      <div className="reading-actions">
                         <button
-                          className="button secondary"
-                          onClick={() => setParams({ activity: 'simulate' })}
+                          className="button primary"
+                          disabled={busy}
+                          onClick={() => read(resource.id)}
                         >
-                          Explore the simulation
-                          <ArrowRight size={16} />
+                          <Check size={16} />
+                          Mark as read
                         </button>
-                      )}
-                    </div>
-                  )}
-                </section>
-              ))}
-            </article>
-            <aside className="reading-notes">
-              <h2>Make the concept stick</h2>
-              <p>Before moving on,explain the invariant in your own words.</p>
-              <div className="note-rule" />
-              <h3>Your evidence</h3>
-              <dl>
-                <div>
-                  <dt>Completion</dt>
-                  <dd>{formatPercent(progress?.completionPercent || 0)}</dd>
-                </div>
-                <div>
-                  <dt>Mastery</dt>
-                  <dd>{formatPercent(progress?.masteryPercent)}</dd>
-                </div>
-              </dl>
-              <p className="field-help">
-                Mastery needs at least two submitted concept checks. Reading alone does not
-                establish it.
-              </p>
-            </aside>
-          </div>
-        ) : (
-          <Empty>
-            Learning resources are not yet available for this mapped topic. Its syllabus position is
-            retained; no activity is counted as completed.
-          </Empty>
-        ))}
-      {activity === 'simulate' &&
-        (user.role === 'STUDENT' ? (
-          topic.availability.simulate ? (
-            <SimulationPane key={topicId} topicId={topicId} />
+                        {topic.availability.simulate && (
+                          <button
+                            className="button secondary"
+                            onClick={() => setParams({ activity: 'simulate' })}
+                          >
+                            Explore the simulation
+                            <ArrowRight size={16} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </section>
+                ))}
+              </article>
+              <aside className="reading-notes">
+                <h2>Make the concept stick</h2>
+                <p>Before moving on,explain the invariant in your own words.</p>
+                <div className="note-rule" />
+                <h3>Your evidence</h3>
+                <dl>
+                  <div>
+                    <dt>Completion</dt>
+                    <dd>{formatPercent(progress?.completionPercent || 0)}</dd>
+                  </div>
+                  <div>
+                    <dt>Mastery</dt>
+                    <dd>{formatPercent(progress?.masteryPercent)}</dd>
+                  </div>
+                </dl>
+                <p className="field-help">
+                  Mastery needs at least two submitted concept checks. Reading alone does not
+                  establish it.
+                </p>
+              </aside>
+            </div>
           ) : (
             <Empty>
-              No simulator is available for this topic. Use its explanation and concept check where
-              available.
+              Learning resources are not yet available for this mapped topic. Its syllabus position
+              is retained; no activity is counted as completed.
             </Empty>
-          )
-        ) : (
-          <Empty>
-            Simulation attempts belong to student accounts. Use Content studio to manage the
-            definition.
-          </Empty>
-        ))}
-      {activity === 'assess' &&
-        (user.role === 'STUDENT' ? (
-          topic.availability.assess ? (
-            <AssessmentPane key={topicId} topicId={topicId} />
-          ) : (
-            <Empty>No concept check has been published for this topic.</Empty>
-          )
-        ) : (
-          <Empty>
-            Student assessment attempts are private. Review question definitions in Content studio.
-          </Empty>
-        ))}
-      {activity === 'code' &&
-        (user.role === 'STUDENT' ? (
-          topic.availability.code ? (
-            <Suspense fallback={<Loading />}>
-              <CodingPane key={topicId} topicId={topicId} />
-            </Suspense>
+          ))}
+        {activity === 'simulate' &&
+          (user.role === 'STUDENT' ? (
+            topic.availability.simulate ? (
+              <SimulationPane key={topicId} topicId={topicId} />
+            ) : (
+              <Empty>
+                No simulator is available for this topic. Use its explanation and concept check
+                where available.
+              </Empty>
+            )
           ) : (
             <Empty>
-              This topic has no coding exercise. DBMS SQL and PL/SQL are explained and assessed
-              without a live database query runner.
+              Simulation attempts belong to student accounts. Use Content studio to manage the
+              definition.
             </Empty>
-          )
-        ) : (
-          <Empty>Code execution is available to enrolled student accounts.</Empty>
-        ))}
+          ))}
+        {activity === 'assess' &&
+          (user.role === 'STUDENT' ? (
+            topic.availability.assess ? (
+              <AssessmentPane key={topicId} topicId={topicId} />
+            ) : (
+              <Empty>No concept check has been published for this topic.</Empty>
+            )
+          ) : (
+            <Empty>
+              Student assessment attempts are private. Review question definitions in Content
+              studio.
+            </Empty>
+          ))}
+        {activity === 'code' &&
+          (user.role === 'STUDENT' ? (
+            topic.availability.code ? (
+              <Suspense fallback={<Loading />}>
+                <CodingPane key={topicId} topicId={topicId} />
+              </Suspense>
+            ) : (
+              <Empty>
+                This topic has no coding exercise. DBMS SQL and PL/SQL are explained and assessed
+                without a live database query runner.
+              </Empty>
+            )
+          ) : (
+            <Empty>Code execution is available to enrolled student accounts.</Empty>
+          ))}
+      </div>
     </>
   );
 }
 function ArrayState({ values, pointers }) {
+  const container = useRef(null),
+    previous = useRef(new Map()),
+    previousValues = useRef([]);
+  const occurrences = new Map();
+  const items = values.map((value, index) => {
+    const occurrence = occurrences.get(value) || 0;
+    occurrences.set(value, occurrence + 1);
+    return { value, index, key: `${value}:${occurrence}` };
+  });
+  useLayoutEffect(() => {
+    const next = new Map();
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (const cell of container.current?.querySelectorAll('[data-value-key]') || []) {
+      const position = cell.offsetLeft,
+        old = previous.current.get(cell.dataset.valueKey);
+      next.set(cell.dataset.valueKey, position);
+      if (!reduced && old !== undefined && old !== position)
+        cell
+          .querySelector('.array-value')
+          .animate(
+            [{ transform: `translateX(${old - position}px)` }, { transform: 'translateX(0)' }],
+            { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' },
+          );
+    }
+    previous.current = next;
+    previousValues.current = [...values];
+  }, [values]);
   return (
-    <div className="array-state" aria-label="Algorithm array">
+    <div className="array-state" aria-label="Algorithm array" ref={container}>
       <div className="array-cells">
-        {values.map((value, i) => {
+        {items.map(({ value, index: i, key }) => {
           const labels = Object.entries(pointers || {})
             .filter(
               ([k, v]) => ['low', 'high', 'mid', 'i', 'j', 'targetIndex'].includes(k) && v === i,
@@ -244,8 +281,9 @@ function ArrayState({ values, pointers }) {
             .map(([k]) => k);
           return (
             <div
-              className={`array-cell ${labels.includes('mid') || labels.includes('j') ? 'is-current' : ''} ${labels.includes('targetIndex') ? 'is-found' : ''}`}
-              key={i}
+              className={`array-cell ${labels.includes('mid') || labels.includes('j') || labels.includes('i') ? 'is-current' : ''} ${labels.includes('targetIndex') ? 'is-found' : ''} ${previousValues.current.length && previousValues.current[i] !== value ? 'is-changed' : ''}`}
+              key={key}
+              data-value-key={key}
             >
               <div className="pointer-label">
                 {labels.map((label) => (
@@ -291,13 +329,23 @@ function GraphState({ state }) {
           y1={positions[e.from].y}
           x2={positions[e.to].x}
           y2={positions[e.to].y}
-          stroke="#c5cdd2"
+          className={
+            state.visited.includes(e.from) && state.visited.includes(e.to)
+              ? 'graph-edge visited'
+              : 'graph-edge'
+          }
+          stroke={
+            state.visited.includes(e.from) && state.visited.includes(e.to) ? '#188b72' : '#c5cdd2'
+          }
           strokeWidth="1.6"
           markerEnd={state.graph.directed ? 'url(#arrow)' : undefined}
         />
       ))}
       {vertices.map((v) => (
-        <g key={v}>
+        <g
+          key={v}
+          className={`graph-node ${state.visited.includes(v) ? 'visited' : ''} ${state.pointers.currentNodeId === v ? 'current-node' : ''}`}
+        >
           <circle
             cx={positions[v].x}
             cy={positions[v].y}
@@ -360,22 +408,22 @@ function TreeState({ state }) {
       {state.tree
         .filter((n) => positions[n.nodeId])
         .map((n) => (
-          <g key={n.nodeId}>
+          <g
+            key={n.nodeId}
+            className={`tree-node ${state.pointers.currentNodeId === n.nodeId ? 'current-node' : ''}`}
+            style={{
+              transform: `translate(${positions[n.nodeId].x}px, ${positions[n.nodeId].y}px)`,
+            }}
+          >
             <circle
-              cx={positions[n.nodeId].x}
-              cy={positions[n.nodeId].y}
+              cx={0}
+              cy={0}
               r="20"
               fill={state.visited.includes(n.value) ? '#e7f2f4' : 'white'}
               stroke={state.pointers.currentNodeId === n.nodeId ? '#1b6c80' : '#a3acb1'}
               strokeWidth={state.pointers.currentNodeId === n.nodeId ? 2 : 1}
             />
-            <text
-              x={positions[n.nodeId].x}
-              y={positions[n.nodeId].y + 5}
-              textAnchor="middle"
-              fontSize="14"
-              fill="#131416"
-            >
+            <text x={0} y={5} textAnchor="middle" fontSize="14" fill="#131416">
               {n.value}
             </text>
           </g>
@@ -396,10 +444,17 @@ export function SimulationPane({ topicId }) {
     [busy, setBusy] = useState(false),
     [playing, setPlaying] = useState(false);
   const latest = useRef(null);
+  const inFlight = useRef(false),
+    autoStartKey = useRef(newKey()),
+    autoResume = useRef(true),
+    feedbackUntil = useRef(0);
   latest.current = session;
   useEffect(() => {
+    let active = true;
+    setBusy(true);
     get(`/topics/${topicId}/simulations`)
       .then(async (list) => {
+        if (!active) return;
         setDefinitions(list);
         if (list[0]) {
           setSelected(list[0]);
@@ -410,13 +465,52 @@ export function SimulationPane({ topicId }) {
           try {
             const s = await patch(`/simulation-sessions/${existing}`, { command: 'SYNC' });
             if (s.topicId === topicId) {
+              if (!active) return;
+              setSelected(list.find((definition) => definition.id === s.simulationId) || list[0]);
+              setInput(JSON.stringify(s.input, null, 2));
+              latest.current = s;
               setSession(s);
               await updatePrediction(s);
+              await resume(s);
+              return;
             }
           } catch {}
+        if (active && list[0]) {
+          try {
+            const s = await post('/simulation-sessions', {
+              simulationId: list[0].id,
+              input: list[0].defaultInput,
+              idempotencyKey: autoStartKey.current,
+            });
+            if (!active) return;
+            latest.current = s;
+            setSession(s);
+            setParams({ activity: 'simulate', attempt: s.id }, { replace: true });
+            await updatePrediction(s);
+            await resume(s);
+          } catch (error) {
+            if (active) setError(error);
+          }
+        }
       })
-      .catch(setError);
+      .catch(setError)
+      .finally(() => {
+        if (active) setBusy(false);
+      });
+    return () => {
+      active = false;
+    };
   }, [topicId]);
+  const resume = async (s) => {
+    if (!s || s.pendingPredictionId || s.state.done) return;
+    const next = await patch(`/simulation-sessions/${s.id}`, {
+      command: 'PLAY',
+      recordVersion: s.recordVersion,
+    });
+    latest.current = next;
+    setSession(next);
+    setPlaying(true);
+  };
   const updatePrediction = async (s) => {
     if (!s.predictionId) {
       setPrediction(null);
@@ -435,6 +529,9 @@ export function SimulationPane({ topicId }) {
     setChoice('');
   };
   const control = async (command, extra = {}) => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setBusy(true);
     setError(null);
     try {
       const current = latest.current,
@@ -443,6 +540,7 @@ export function SimulationPane({ topicId }) {
           recordVersion: current.recordVersion,
           ...extra,
         });
+      latest.current = s;
       setSession(s);
       if (s.status === 'COMPLETED') {
         setPlaying(false);
@@ -455,33 +553,56 @@ export function SimulationPane({ topicId }) {
       setError(e);
       setPlaying(false);
       throw e;
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
     }
   };
   useEffect(() => {
-    if (!playing || !session || session.pendingPredictionId || session.status === 'COMPLETED')
+    if (
+      !playing ||
+      busy ||
+      !session ||
+      session.pendingPredictionId ||
+      session.status === 'COMPLETED'
+    )
       return;
-    const timer = setTimeout(() => control('NEXT').catch(() => {}), 1000 / session.speed);
+    const timer = setTimeout(
+      () => control('NEXT').catch(() => {}),
+      Math.max(1200 / session.speed, feedbackUntil.current - Date.now()),
+    );
     return () => clearTimeout(timer);
-  }, [playing, session?.cursor, session?.recordVersion, session?.pendingPredictionId]);
-  const start = async () => {
+  }, [
+    playing,
+    busy,
+    session?.cursor,
+    session?.speed,
+    session?.recordVersion,
+    session?.pendingPredictionId,
+  ]);
+  const start = async (definition = selected, rawInput = input) => {
+    setPlaying(false);
     setBusy(true);
     setError(null);
     try {
       let parsed;
       try {
-        parsed = JSON.parse(input);
+        parsed = JSON.parse(rawInput);
       } catch {
         throw new Error('Enter valid JSON for the algorithm input.');
       }
       const s = await post('/simulation-sessions', {
-        simulationId: selected.id,
+        simulationId: definition.id,
         input: parsed,
         idempotencyKey: newKey(),
       });
+      latest.current = s;
       setSession(s);
       setPrediction(null);
-      setPlaying(false);
+      autoResume.current = true;
       setParams({ activity: 'simulate', attempt: s.id }, { replace: true });
+      await updatePrediction(s);
+      await resume(s);
     } catch (e) {
       setError(e.response ? e : e.message);
     } finally {
@@ -500,7 +621,11 @@ export function SimulationPane({ topicId }) {
         recordVersion: prediction.recordVersion,
       });
       setPrediction({ ...p, definition: prediction.definition });
-      setSession(await patch(`/simulation-sessions/${session.id}`, { command: 'SYNC' }));
+      feedbackUntil.current = Date.now() + (action === 'ANSWER' ? 3500 : 1200);
+      const synced = await patch(`/simulation-sessions/${session.id}`, { command: 'SYNC' });
+      latest.current = synced;
+      setSession(synced);
+      if (autoResume.current && !synced.pendingPredictionId) await resume(synced);
       refresh().catch(() => {});
     } catch (e) {
       setError(e);
@@ -526,6 +651,18 @@ export function SimulationPane({ topicId }) {
           )}
         </div>
         <ErrorBox error={error} />
+        {session && (
+          <div className="simulation-playback-status" role="status">
+            <span className={`playback-indicator ${playing ? 'running' : ''}`} />
+            {state.done
+              ? 'Simulation complete'
+              : session.pendingPredictionId
+                ? 'Your turn · answer or skip to continue'
+                : playing
+                  ? 'Playing automatically'
+                  : 'Playback paused'}
+          </div>
+        )}
         {session?.sourceMode === 'FIXTURE' && (
           <div className="notice">
             Synthetic history. This session does not contribute to real progress.
@@ -599,7 +736,7 @@ export function SimulationPane({ topicId }) {
             </div>
           </section>
         )}
-        <div className="algorithm-canvas">
+        <div className={`algorithm-canvas ${playing ? 'is-playing' : ''}`}>
           {!state ? (
             <>
               <ArrayState
@@ -635,7 +772,11 @@ export function SimulationPane({ topicId }) {
                   )}
                 </>
               )}
-              <div className="state-message" aria-live="polite">
+              <div
+                className="state-message"
+                key={`${session.id}:${session.cursor}`}
+                aria-live="polite"
+              >
                 <span>{state.event.toLowerCase().replaceAll('_', ' ')}</span>
                 <p>{state.message}</p>
               </div>
@@ -644,6 +785,20 @@ export function SimulationPane({ topicId }) {
         </div>
         {session && (
           <>
+            <div
+              className="simulation-timeline"
+              role="progressbar"
+              aria-label="Simulation steps"
+              aria-valuemin={0}
+              aria-valuemax={session.traceLength - 1}
+              aria-valuenow={session.cursor}
+            >
+              <span
+                style={{
+                  width: `${(100 * session.cursor) / Math.max(1, session.traceLength - 1)}%`,
+                }}
+              />
+            </div>
             <div className="playback-controls">
               <button
                 className="icon-button"
@@ -659,6 +814,7 @@ export function SimulationPane({ topicId }) {
                 disabled={busy || session.pendingPredictionId || state.done}
                 onClick={async () => {
                   try {
+                    autoResume.current = !playing;
                     await control(playing ? 'PAUSE' : 'PLAY');
                     setPlaying(!playing);
                   } catch {}
@@ -681,6 +837,7 @@ export function SimulationPane({ topicId }) {
                 disabled={busy}
                 onClick={() => {
                   setPlaying(false);
+                  autoResume.current = false;
                   control('RESET').catch(() => {});
                 }}
               >
@@ -709,7 +866,9 @@ export function SimulationPane({ topicId }) {
                 .map(([key, value]) => (
                   <div key={key}>
                     <span>{key.replace(/([A-Z])/g, ' $1').toLowerCase()}</span>
-                    <strong>{value}</strong>
+                    <strong key={value} className="counter-value">
+                      {value}
+                    </strong>
                   </div>
                 ))}
             </div>
@@ -728,6 +887,7 @@ export function SimulationPane({ topicId }) {
             Algorithm
             <select
               value={selected.id}
+              disabled={busy}
               onChange={(e) => {
                 const s = definitions.find((d) => d.id === e.target.value);
                 setSelected(s);
@@ -735,6 +895,8 @@ export function SimulationPane({ topicId }) {
                 setSession(null);
                 setPrediction(null);
                 setPlaying(false);
+                autoResume.current = true;
+                start(s, JSON.stringify(s.defaultInput, null, 2));
               }}
             >
               {definitions.map((d) => (
@@ -762,7 +924,7 @@ export function SimulationPane({ topicId }) {
         <button
           className={`button ${session ? 'secondary' : 'primary'} full-width`}
           disabled={busy}
-          onClick={start}
+          onClick={() => start()}
         >
           {session ? 'Start a new session' : 'Start simulation'}
         </button>

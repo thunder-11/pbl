@@ -1,5 +1,5 @@
 {
-  "name": "trace-learning-workbench",
+  "name": "cerebro-learning-workbench",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -13,6 +13,7 @@
     "start": "npm start --workspace backend",
     "test": "npm test --workspace backend",
     "test:e2e": "node tests/journey.mjs",
+    "test:motion": "node tests/motion.mjs",
     "seed": "npm run seed --workspace backend",
     "format": "prettier --write \"backend/src/**/*.js\" \"backend/tests/**/*.js\" \"frontend/src/**/*.{js,jsx,css}\" \"scripts/*.mjs\" \"tests/*.mjs\" \"frontend/vite.config.js\""
   },

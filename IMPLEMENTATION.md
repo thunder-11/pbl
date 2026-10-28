@@ -1,6 +1,6 @@
-# Trace implementation and verification
+# Cerebro implementation and verification
 
-Trace is a modular MERN monolith with a responsive React workbench, Express API, Mongoose models and MongoDB transactions. Application logic is JavaScript. Local development runs an actual MongoDB 7 replica set with persistent data; it does not substitute an in-memory document store for the database. Start with `npm install` and `npm run dev`; see README.md for environment and deployment instructions.
+Cerebro is a modular MERN monolith with a responsive React workbench, Express API, Mongoose models and MongoDB transactions. Application logic is JavaScript. Local development runs an actual MongoDB 7 replica set with persistent data; it does not substitute an in-memory document store for the database. Start with `npm install` and `npm run dev`; see README.md for environment and deployment instructions.
 
 ## Implemented scope
 

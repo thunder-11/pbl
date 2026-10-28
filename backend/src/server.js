@@ -9,7 +9,7 @@ validateConfig();
 await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 5000 });
 for (const model of Object.values(M)) await model.createIndexes();
 const server = createApp().listen(config.port, config.production ? '0.0.0.0' : '127.0.0.1', () =>
-  console.log(`Trace API ready at http://127.0.0.1:${config.port}/api/v1`),
+  console.log(`Cerebro API ready at http://127.0.0.1:${config.port}/api/v1`),
 );
 const safe = (fn) => () =>
   fn().catch((e) =>

@@ -23,7 +23,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.error)
       return (
         <div className="app-fatal">
-          <h1>Trace could not display this screen.</h1>
+          <h1>Cerebro could not display this screen.</h1>
           <p>Reload the workspace to restore its last saved state.</p>
           <button className="button primary" onClick={() => location.reload()}>
             Reload workspace

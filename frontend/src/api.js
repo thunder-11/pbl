@@ -42,7 +42,7 @@ http.interceptors.response.use(
         return await http(request);
       } catch {
         setCredentials(null);
-        window.dispatchEvent(new Event('trace:session-ended'));
+        window.dispatchEvent(new Event('cerebro:session-ended'));
       }
     }
     throw error;

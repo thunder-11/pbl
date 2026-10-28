@@ -94,7 +94,7 @@ export function AuthPage() {
         <div className="brand">
           <Mark />
           <span>
-            Trace<span className="brand-subline">Computer Engineering</span>
+            Cerebro<span className="brand-subline">Computer Engineering</span>
           </span>
         </div>
         <div className="auth-story-content">

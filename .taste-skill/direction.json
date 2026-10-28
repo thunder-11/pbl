@@ -5,7 +5,7 @@
  "seed": 191100531,
  "input": {
   "kind": "devtools",
-  "brief": "Trace, a Computer Engineering curriculum learning workbench for SY Data Structures and TY DSA AI DBMS with deterministic algorithm state traces and honest progress",
+  "brief": "Cerebro, a Computer Engineering curriculum learning workbench for SY Data Structures and TY DSA AI DBMS with deterministic algorithm state traces and honest progress",
   "theme": "light",
   "screens": [
    "overview",

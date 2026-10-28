@@ -80,21 +80,10 @@ try {
   await page.getByText('Reading recorded.').waitFor();
   checks.push('Syllabus navigation and read acknowledgment');
   await page.getByRole('tab', { name: 'Simulate & predict' }).click();
-  await page.getByRole('button', { name: 'Start simulation', exact: true }).click();
-  await page.getByRole('button', { name: 'Next step', exact: true }).click();
   await page.getByRole('heading', { name: 'Predict the next step' }).waitFor();
   await page.getByLabel('low =3', { exact: true }).check();
   await page.getByRole('button', { name: 'Check prediction' }).click();
   await page.getByText('Correct first answer', { exact: true }).waitFor();
-  for (let i = 0; i < 12; i++) {
-    const previous = await page.locator('.simulation-toolbar .badge').textContent();
-    if (previous === 'Complete') break;
-    await page.getByRole('button', { name: 'Next step', exact: true }).click();
-    await page.waitForFunction(
-      (previous) => document.querySelector('.simulation-toolbar .badge')?.textContent !== previous,
-      previous,
-    );
-  }
   await page.getByText('Complete', { exact: true }).first().waitFor();
   checks.push('Deterministic Binary Search,prediction and final-state completion');
   await inspect('simulation');

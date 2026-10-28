@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 @source "./**/*.{js,jsx}";
 :root {
-  --ground: #f9fbfc;
+  --ground: #f3f7fa;
   --surface: #fff;
   --raised: #f4f6f8;
   --active: #ebedee;
@@ -10,7 +10,7 @@
   --control: #b7bec3;
   --text: #131416;
   --muted: #5d5f60;
-  --accent: #1b6c80;
+  --accent: #116d81;
   --positive: #1e7b4f;
   --negative: #b91f25;
   --gap: 24px;
@@ -2579,5 +2579,244 @@ td:last-child {
   }
   .text-button {
     min-height: 36px;
+  }
+}
+
+/* Motion follows state: one workspace entrance, then direct feedback for actions. */
+@keyframes workspace-enter {
+  from {
+    opacity: 0.5;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes state-enter {
+  from {
+    opacity: 0.4;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes value-arrive {
+  from {
+    opacity: 0.5;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes value-update {
+  from {
+    background-color: #ffe3aa;
+  }
+  to {
+    background-color: #fff6df;
+  }
+}
+@keyframes node-focus {
+  from {
+    stroke-width: 6;
+    stroke: #e8b24f;
+  }
+  to {
+    stroke-width: 3;
+    stroke: #116d81;
+  }
+}
+.sheet {
+  animation: workspace-enter 240ms ease-out both;
+}
+.activity-panel {
+  animation: state-enter 180ms ease-out;
+}
+.button.primary:disabled {
+  background: #e8edf0;
+  color: #68757b;
+  border-color: #d6e0e5;
+}
+.button,
+.icon-button,
+.sidebar nav a,
+.tabs button,
+.prediction-choice {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 140ms ease;
+}
+.button:active:not(:disabled),
+.icon-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.button.primary:hover:not(:disabled) {
+  background: #0c5666;
+  border-color: #0c5666;
+}
+.workflow-strip {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+.workflow-step .step-marker {
+  background: #edf4fc;
+  border-color: #b8cee5;
+  color: #2c5c97;
+}
+.workflow-step.simulate .step-marker {
+  background: #fff4dc;
+  border-color: #e6cc91;
+  color: #865d16;
+}
+.workflow-step.assess .step-marker {
+  background: #eaf5f3;
+  border-color: #add4cc;
+  color: #226b5b;
+}
+.workflow-step.code .step-marker {
+  background: #f9edf0;
+  border-color: #dfbbc6;
+  color: #944d64;
+}
+.workflow-step.complete .step-marker {
+  background: #e4f5ec;
+  border-color: #9ccfb6;
+  color: #1e7b4f;
+}
+.progress-track > span {
+  transition: width 450ms ease;
+}
+.simulation-playback-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+.playback-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9ba7ac;
+}
+.playback-indicator.running {
+  background: #168366;
+  box-shadow: 0 0 0 4px #e6f4ed;
+}
+.algorithm-canvas {
+  transition:
+    border-color 240ms ease,
+    background-color 240ms ease;
+  background: #fbfdff;
+}
+.algorithm-canvas.is-playing {
+  border-color: #b0cfd7;
+}
+.array-cells {
+  position: relative;
+}
+.array-value {
+  animation: value-arrive 240ms ease-out;
+  transition:
+    background-color 250ms ease,
+    border-color 250ms ease,
+    color 250ms ease;
+}
+.array-cell.is-changed .array-value {
+  background: #fff6df;
+  border-color: #d6a54a;
+  animation: value-update 500ms ease-out;
+}
+.array-cell.is-current .array-value {
+  background: #e2f1f8;
+  border-color: #197794;
+  color: #155c73;
+}
+.array-cell.is-found .array-value {
+  background: #def4e8;
+  border-color: #18815a;
+  color: #155f43;
+}
+.pointer-label {
+  transition: color 200ms ease;
+}
+.state-message {
+  animation: state-enter 240ms ease-out;
+}
+.state-message > span {
+  color: var(--accent);
+}
+.simulation-timeline {
+  height: 4px;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #e9eff3;
+  margin: 18px 0 4px;
+}
+.simulation-timeline > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 380ms ease;
+}
+.counter-value {
+  display: inline-block;
+  animation: state-enter 220ms ease-out;
+}
+.graph-node circle,
+.tree-node circle,
+.graph-edge {
+  transition:
+    fill 350ms ease,
+    stroke 350ms ease,
+    stroke-width 350ms ease;
+}
+.graph-node.visited circle {
+  fill: #def4e8;
+  stroke: #27856b;
+}
+.current-node circle {
+  fill: #e1f2f8;
+  animation: node-focus 500ms ease-out;
+  stroke: #116d81;
+  stroke-width: 3;
+}
+@keyframes node-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.tree-node {
+  animation: node-arrive 300ms ease-out;
+  transition: transform 400ms ease;
+}
+.prediction-card {
+  border-color: #d7bd7f;
+  background: #fffcf4;
+  animation: state-enter 240ms ease-out;
+}
+.prediction-choice.selected {
+  border-color: #b18b35;
+  background: #fff3d3;
+}
+@media (max-width: 680px) {
+  .workflow-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

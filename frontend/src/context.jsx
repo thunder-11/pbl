@@ -18,10 +18,10 @@ export function AuthProvider({ children }) {
         if (active) setLoading(false);
       });
     const ended = () => setUser(null);
-    window.addEventListener('trace:session-ended', ended);
+    window.addEventListener('cerebro:session-ended', ended);
     return () => {
       active = false;
-      window.removeEventListener('trace:session-ended', ended);
+      window.removeEventListener('cerebro:session-ended', ended);
     };
   }, []);
   const login = async (body) => {

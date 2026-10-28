@@ -1,4 +1,4 @@
-# Trace — Computer Engineering learning workbench
+# Cerebro — Computer Engineering Learning Workbench
 
 A JavaScript MERN application implementing the nine learning capabilities in [PRD.md](./PRD.md). It uses React/Vite/Tailwind, Express, MongoDB7/Mongoose, JWT/bcrypt, Monaco and Recharts. The source-mapped curriculum contains SY Semester IV Data Structures plus TY Semester V DSA, AI and DBMS. Four subjects,20 units and40 topic groups are mapped;14 topics initially have authored learning resources. The remaining26 display an explicit unavailable-resource state.
 
@@ -34,6 +34,8 @@ These are synthetic development identities. Existing accounts retain changes mad
 
 - Topic-scoped reading,availability and completion across the selected source syllabus.
 - All11 deterministic simulator families:Linear/Binary Search,Bubble/Selection/Insertion/Merge Sort,Stack,Queue,BST,BFS and DFS. Playback,next/previous/reset,speed,input validation,internal state and counters work through the backend.
+- Opening a simulation starts and plays it automatically. Prediction checkpoints pause playback; answering or skipping resumes it, with time to read the feedback. Values slide between array positions, changed cells and active nodes show state colors, and counters/timeline update with the trace. Pause, manual stepping, reset and speed remain available. Reduced-motion preferences suppress visual animations.
+- Topic tabs and workflow steps only show published, available activities. Deep links to unavailable activities fall back to the first available activity; topics without activities show a single empty state.
 - Binary Search,Bubble Sort and BFS prediction checkpoints,immediate explanations,one feedback-only retry and first-answer accuracy.
 - Snapshot-based five-question assessments,answer saving,server deadlines,atomic grading,idempotent finalization and recent-score mastery.
 - Deterministic recommendations and explicit recurring-misconception mappings,with separate compilation/runtime/test-failure categories.
@@ -58,6 +60,7 @@ The backend persists dispatch intent,submits each job once,polls bounded tokens 
 npm test
 npm run build
 npm run test:e2e
+npm run test:motion
 ```
 
 The Node test suite covers all algorithm families,golden counters,closed inputs,authentication/refresh/revocation,ownership,enrollment boundaries,assessment scoring,recurrence,grading-result redaction,provider failure contracts,content publication,rate limiting and deletion. It uses an isolated `trace_integration_test` database and never drops the development database. If the local development replica set is not running,it starts a disposable MongoDB7 replica set using the same binary cache.

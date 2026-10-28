@@ -124,7 +124,7 @@ export function TopicLink({ topic, children, activity }) {
     </Link>
   );
 }
-export function WorkflowStrip({ progress }) {
+export function WorkflowStrip({ progress, availability }) {
   const entries = [
     ['UNDERSTAND', 'Understand', 'Read the concept'],
     ['SIMULATE', 'Predict', 'Explore each state'],
@@ -133,21 +133,34 @@ export function WorkflowStrip({ progress }) {
   ];
   return (
     <div className="workflow-strip">
-      {entries.map(([key, title, description]) => {
-        const available = progress?.availableCategories?.includes(key),
-          done = progress?.completedCategories?.includes(key);
-        return (
-          <div key={key} className={`workflow-step ${done ? 'complete' : ''}`}>
-            <span className="step-marker">
-              {done ? <Check size={13} aria-hidden="true" /> : '•'}
-            </span>
-            <div>
-              <strong>{title}</strong>
-              <span>{available ? description : 'Not available for this topic'}</span>
+      {entries
+        .filter(([key]) =>
+          availability
+            ? availability[
+                { UNDERSTAND: 'understand', SIMULATE: 'simulate', ASSESS: 'assess', CODE: 'code' }[
+                  key
+                ]
+              ]
+            : progress?.availableCategories?.includes(key),
+        )
+        .map(([key, title, description]) => {
+          const available = progress?.availableCategories?.includes(key),
+            done = progress?.completedCategories?.includes(key);
+          return (
+            <div
+              key={key}
+              className={`workflow-step ${key.toLowerCase()} ${done ? 'complete' : ''}`}
+            >
+              <span className="step-marker">
+                {done ? <Check size={13} aria-hidden="true" /> : '•'}
+              </span>
+              <div>
+                <strong>{title}</strong>
+                <span>{available ? description : 'Not available for this topic'}</span>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </div>
   );
 }
@@ -195,7 +208,7 @@ export function Shell({ children }) {
         <Link to="/" className="brand">
           <Mark />
           <span>
-            Trace<span className="brand-subline">Learning workbench</span>
+            Cerebro<span className="brand-subline">Learning workbench</span>
           </span>
         </Link>
         <div className="workspace-label">
@@ -267,7 +280,7 @@ export function Shell({ children }) {
           </form>
           <span className="scope-note">Understand. Predict. Implement.</span>
         </div>
-        <main id="main" className="sheet">
+        <main id="main" className="sheet" key={location.pathname}>
           {loading ? (
             <Loading />
           ) : error ? (
