@@ -4,30 +4,9 @@ import { randomSecret } from './utils.js';
 import { audit } from './auth.js';
 export async function cleanup() {
   const cutoff = new Date(Date.now() - 365 * 86400000);
-  for (const kind of [
-    'assessmentAttempts',
-    'codingAttempts',
-    'simulationSessions',
-    'recommendations',
-    'comparisonRuns',
-  ]) {
-    const old = await M[kind]
-        .find({ createdAt: { $lt: cutoff } })
-        .select('_id')
-        .limit(1000)
-        .lean(),
-      ids = old.map((d) => d._id);
-    if (!ids.length) continue;
-    if (['assessmentAttempts', 'codingAttempts'].includes(kind))
-      await M.mistakeEvidence.deleteMany({ sourceId: { $in: ids } });
-    if (kind === 'simulationSessions')
-      await M.predictionAttempts.deleteMany({ sessionId: { $in: ids } });
-    await M[kind].deleteMany({ _id: { $in: ids } });
-  }
-  await M.topicProgress.updateMany(
-    {},
-    { $pull: { readConfirmations: { readAt: { $lt: cutoff } } } },
-  );
+  // Learning evidence follows the student throughout the degree. Only transient
+  // recommendations expire automatically; account deletion purges all personal data.
+  await M.recommendations.deleteMany({ createdAt: { $lt: cutoff } });
   for (const user of await M.users
     .find({
       status: 'DELETION_PENDING',
@@ -56,6 +35,7 @@ export async function cleanup() {
             passwordHash: await bcrypt.hash(randomSecret(), 12),
             subjectIds: [],
             academicYear: null,
+            studentProfile: {},
             status: 'ANONYMIZED',
           },
           $inc: { authVersion: 1, recordVersion: 1 },

@@ -1,9 +1,10 @@
+import StudentProfile from './student-profile';
 import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
-import '@fontsource/ibm-plex-sans/400.css';
-import '@fontsource/ibm-plex-sans/500.css';
-import '@fontsource/ibm-plex-sans/600.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import { AuthProvider, DataProvider, useAuth } from './context';
 import { Shell, Loading, Empty } from './components';
@@ -13,6 +14,8 @@ import { FacultyPage, ContentPage, AdminPage } from './staff';
 import ComparePage from './compare';
 import CurriculumEditor from './curriculum-editor';
 import './styles.css';
+import './auth.css';
+import './tokens.css';
 const WorkspacePage = lazy(() => import('./workspace').then((m) => ({ default: m.WorkspacePage })));
 class ErrorBoundary extends React.Component {
   state = { error: null };
@@ -110,6 +113,14 @@ function App() {
               element={
                 <Guard roles={['ADMIN']}>
                   <AdminPage />
+                </Guard>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <Guard roles={['STUDENT']}>
+                  <StudentProfile />
                 </Guard>
               }
             />

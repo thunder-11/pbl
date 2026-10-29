@@ -1,0 +1,368 @@
+.auth-screen {
+  grid-template-columns: 53fr 47fr;
+  max-width: none;
+  background: var(--surface);
+  color: var(--text);
+  align-items: start;
+}
+.auth-screen .auth-story {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  min-height: 720px;
+  padding: var(--s12) clamp(32px, 4.4vw, 72px);
+  background: var(--ground);
+  justify-content: flex-start;
+}
+.auth-screen .auth-environment {
+  position: absolute;
+  inset: -4px;
+  z-index: -2;
+  background: url('/images/cerebro-workbench.png') center bottom/cover no-repeat;
+  transform: translate3d(var(--ambient-parallax-x, 0px), var(--ambient-parallax-y, 0px), 0);
+  pointer-events: none;
+}
+.auth-screen .auth-story::before {
+  z-index: 0;
+}
+.auth-screen .auth-story::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 95% 65% at 30% 36%,
+    rgba(var(--auth-ivory-rgb), 0.94) 0%,
+    rgba(var(--auth-ivory-rgb), 0.9) 40%,
+    rgba(var(--auth-ivory-rgb), 0.64) 65%,
+    rgba(var(--auth-ivory-rgb), 0) 100%
+  );
+}
+.auth-screen .auth-story > .brand,
+.auth-screen .auth-story-content {
+  position: relative;
+  z-index: 1;
+}
+.auth-screen .brand {
+  align-self: flex-start;
+  font-size: 24px;
+  line-height: var(--s8);
+  gap: var(--s3);
+  letter-spacing: -0.6px;
+  color: var(--text);
+}
+.auth-screen .brand-mark {
+  width: var(--s6);
+  height: var(--s6);
+  color: var(--accent);
+}
+.auth-screen .brand-subline {
+  font-size: var(--caption);
+  line-height: var(--s4);
+  margin-top: 0;
+  color: var(--muted);
+}
+.auth-screen .auth-story-content {
+  margin: clamp(48px, 8vh, 96px) 0 0;
+  padding: 0;
+  max-width: 480px;
+}
+.auth-screen .auth-story-content .auth-eyebrow {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: var(--caption);
+  line-height: var(--s4);
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  margin-bottom: var(--s6);
+  max-width: none;
+}
+.auth-screen .auth-story h1 {
+  font-family: var(--auth-serif);
+  font-size: var(--auth-display);
+  font-weight: 400;
+  letter-spacing: -0.055em;
+  line-height: 1.06;
+  margin-bottom: var(--s6);
+  color: var(--text);
+}
+.auth-screen .auth-story-content > p:not(.auth-eyebrow) {
+  font-size: var(--body);
+  line-height: var(--s6);
+  max-width: 35ch;
+  color: var(--text);
+}
+.auth-screen .auth-form-section {
+  min-height: 100dvh;
+  background: var(--surface);
+  padding: var(--s12) clamp(32px, 4.4vw, 72px);
+  border-left: 1px solid var(--border);
+  align-items: flex-start;
+}
+.auth-screen .auth-form {
+  max-width: 480px;
+  gap: var(--s4);
+  margin: 0 auto;
+}
+.auth-screen .auth-tabs {
+  min-height: var(--s12);
+  gap: var(--s8);
+  margin-bottom: var(--s4);
+}
+.auth-screen .auth-tabs button {
+  font-size: var(--body);
+  line-height: var(--s6);
+  color: var(--muted);
+  padding: var(--s3) 0;
+  border-bottom-width: 1px;
+}
+.auth-screen .auth-tabs button.active {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.auth-screen .auth-form > h2 {
+  font-family: var(--auth-serif);
+  font-size: var(--auth-heading);
+  line-height: var(--s12);
+  letter-spacing: -0.04em;
+  font-weight: 400;
+}
+.auth-screen .auth-form > p {
+  font-size: var(--body);
+  line-height: var(--s6);
+  margin-top: calc(-1 * var(--s2));
+  margin-bottom: var(--s2);
+}
+.auth-screen .auth-form > label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  font-size: var(--caption);
+  font-weight: 500;
+}
+.auth-screen .auth-form input:not([type='checkbox']),
+.auth-screen .auth-form select {
+  height: var(--auth-field);
+  background: var(--surface);
+  border: 1px solid var(--control);
+  border-radius: var(--s1);
+  padding: var(--s3);
+  width: 100%;
+  color: var(--text);
+  font-size: var(--body);
+}
+.auth-screen .auth-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.auth-screen .auth-input > svg {
+  position: absolute;
+  left: var(--s4);
+  pointer-events: none;
+  color: var(--muted);
+}
+.auth-screen .auth-input input {
+  padding-left: var(--s12) !important;
+  padding-right: var(--s12) !important;
+}
+.auth-screen .password-toggle {
+  position: absolute;
+  right: var(--s1);
+  top: var(--s1);
+  width: 40px;
+  height: 40px;
+  border: 0;
+  background: transparent;
+  border-radius: var(--s1);
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.auth-screen .password-toggle:hover {
+  background: var(--active);
+  color: var(--accent);
+}
+.auth-screen .auth-form > .button {
+  height: var(--auth-field);
+  border-radius: var(--s1);
+  background: var(--accent);
+  color: var(--surface);
+  border-color: var(--accent);
+  gap: var(--s3);
+  margin-top: var(--s2);
+}
+.auth-screen .auth-form > .button:hover:not(:disabled) {
+  background: var(--text);
+  border-color: var(--text);
+}
+.auth-screen .development-signin {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.auth-screen .auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  margin: var(--s2) 0 var(--s6);
+  font-size: var(--caption);
+  color: var(--auth-warm-gray);
+}
+.auth-screen .auth-divider:before,
+.auth-screen .auth-divider:after {
+  content: '';
+  height: 1px;
+  background: var(--border);
+  flex: 1;
+}
+.auth-screen .development-signin h3 {
+  font-size: var(--section);
+  line-height: var(--s6);
+  font-weight: 600;
+  margin-bottom: var(--s2);
+}
+.auth-screen .development-signin > .field-help {
+  font-size: var(--caption);
+  line-height: 20px;
+  margin-bottom: var(--s4);
+  max-width: 48ch;
+}
+.auth-screen .demo-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.auth-screen .demo-role {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  width: 100%;
+  min-height: var(--auth-row);
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--border);
+  border-radius: var(--s1);
+  background: transparent;
+  color: var(--accent);
+  text-align: left;
+}
+.auth-screen .demo-role > span {
+  flex: 1;
+  min-width: 0;
+}
+.auth-screen .demo-role strong {
+  display: block;
+  font-size: var(--body);
+  line-height: var(--s6);
+  color: var(--text);
+  font-weight: 500;
+}
+.auth-screen .demo-role small {
+  display: block;
+  font-size: var(--caption);
+  line-height: var(--s4);
+  color: var(--muted);
+}
+.auth-screen .demo-role > svg {
+  flex: none;
+}
+.auth-screen .demo-role:hover:not(:disabled) {
+  background: var(--active);
+  border-color: var(--auth-sage);
+}
+.auth-screen .demo-role:disabled,
+.auth-screen .auth-form > .button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+.auth-screen :is(button, input, select, a):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.auth-screen .check-label {
+  font-size: var(--caption);
+  line-height: var(--s4);
+}
+@media (min-width: 1600px) {
+  .auth-screen .auth-form-section {
+    padding-top: clamp(48px, 8vh, 96px);
+  }
+}
+@media (max-width: 1100px) {
+  .auth-screen .auth-story {
+    padding: var(--s8);
+    min-height: 720px;
+  }
+  .auth-screen .auth-story-content {
+    margin-top: var(--s12);
+    max-width: 340px;
+  }
+  .auth-screen .auth-form-section {
+    padding: var(--s8);
+  }
+  .auth-screen .auth-tabs {
+    gap: var(--s6);
+  }
+  .auth-screen .auth-tabs button {
+    font-size: var(--caption);
+  }
+  .auth-screen .auth-story h1 {
+    font-size: 56px;
+  }
+  .auth-screen .auth-form > h2 {
+    font-size: 36px;
+  }
+}
+@media (max-width: 760px) {
+  .auth-screen {
+    display: block;
+  }
+  .auth-screen .auth-story {
+    position: relative;
+    height: auto;
+    min-height: 0;
+    padding: var(--s6);
+    border-bottom: 1px solid var(--border);
+  }
+  .auth-screen .auth-environment,
+  .auth-screen .auth-story-content,
+  .auth-screen .auth-story::before {
+    display: none;
+  }
+  .auth-screen .auth-form-section {
+    min-height: calc(100dvh - 96px);
+    padding: var(--s6);
+    border-left: 0;
+  }
+  .auth-screen .auth-form {
+    max-width: 480px;
+  }
+  .auth-screen .auth-tabs {
+    margin-bottom: var(--s2);
+  }
+  .auth-screen .auth-form > h2 {
+    font-size: 36px;
+    line-height: var(--s12);
+  }
+  .auth-screen .demo-role {
+    min-height: var(--auth-row);
+  }
+}
+
+@media (min-width: 761px) and (max-height: 800px) {
+  .auth-screen .auth-story {
+    padding-top: var(--s8);
+  }
+  .auth-screen .auth-story-content {
+    margin-top: var(--s12);
+  }
+  .auth-screen .auth-story h1 {
+    font-size: clamp(48px, 4.4vw, 64px);
+  }
+}
+@media (max-width: 760px) {
+  .auth-screen .auth-story::after {
+    display: none;
+  }
+}

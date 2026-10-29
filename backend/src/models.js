@@ -88,6 +88,30 @@ const schemaDefinitions = {
     status: enumField(['ACTIVE', 'DISABLED', 'DELETION_PENDING', 'ANONYMIZED'], 'ACTIVE'),
     academicYear: { type: String, enum: ['SY', 'TY', null], default: null },
     subjectIds: [Schema.Types.ObjectId],
+    studentProfile: {
+      type: nested({
+        institution: { type: String, maxlength: 160, default: '' },
+        degree: { type: String, maxlength: 120, default: '' },
+        studentNumber: { type: String, maxlength: 60, default: '' },
+        admissionYear: { type: Number, default: null },
+        graduationYear: { type: Number, default: null },
+        stage: {
+          type: String,
+          enum: ['FY', 'SY', 'TY', 'FINAL', 'GRADUATED', null],
+          default: null,
+        },
+        bio: { type: String, maxlength: 1000, default: '' },
+        goals: { type: String, maxlength: 2000, default: '' },
+        projects: [
+          nested({
+            title: text(120),
+            description: { type: String, maxlength: 1000, default: '' },
+            url: { type: String, maxlength: 500, default: '' },
+          }),
+        ],
+      }),
+      default: () => ({}),
+    },
     authVersion: integer(1, 100000, 1),
     deletionRequestedAt: { type: Date, default: null },
   },
@@ -463,6 +487,13 @@ const indexes = {
     [{ expiresAt: 1 }, { expireAfterSeconds: 0 }],
   ],
 };
+for (const name of [
+  'assessmentAttempts',
+  'codingAttempts',
+  'simulationSessions',
+  'predictionAttempts',
+])
+  models[name].schema.index({ userId: 1, createdAt: -1, _id: -1 });
 for (const [name, definitions] of Object.entries(indexes))
   for (const [index, options] of definitions) models[name].schema.index(index, options);
 export const M = models;

@@ -13,3 +13,7 @@ test-results/
 .taste-skill/qa/
 .taste-skill/inspect*/
 .taste-skill/sign-in/
+.taste-skill/ambient/
+.taste-skill/login-editorial/
+.taste-skill/profile/
+.taste-skill/redesign/

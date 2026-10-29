@@ -1,0 +1,66 @@
+/* Cerebro — shared visual tokens */
+:root {
+  --ground: #f6f5f1;
+  --surface: #ffffff;
+  --raised: #efeee8;
+  --active: #e5eeea;
+  --border: #e7e5de;
+  --rule: var(--border);
+  --control: #a5aaa6;
+  --text: #16191d;
+  --muted: #5b636b;
+  --accent: #0f766e;
+  --positive: var(--accent);
+  --negative: var(--text);
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s6: 24px;
+  --s8: 32px;
+  --s12: 48px;
+  --title: 30px;
+  --wordmark: 20px;
+  --title-line: 36px;
+  --section: 16px;
+  --body: 14px;
+  --caption: 12px;
+  --body-line: 22px;
+  --radius-card: 12px;
+  --radius-control: 10px;
+  --radius-pill: 999px;
+  --sidebar-width: 248px;
+  --content-width: 1200px;
+  --motion: 150ms;
+  --ambient-warm: 224, 201, 161;
+  --ambient-size: 800px;
+  --ambient-blur: 48px;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: var(--body);
+  line-height: var(--body-line);
+}
+:root {
+  color: var(--text);
+  background: var(--ground);
+  font-synthesis: none;
+  font-variant-numeric: tabular-nums;
+}
+/* Authentication palette is scoped so the workbench retains its existing tokens. */
+.auth-screen {
+  --ground: #f5f1e8;
+  --surface: #fcfbf8;
+  --text: #202925;
+  --muted: #66675f;
+  --accent: #304a3f;
+  --border: #e2ded5;
+  --control: #b7b3a9;
+  --active: #e9ede5;
+  --auth-sage: #a6b3a0;
+  --auth-ivory-rgb: 245, 241, 232;
+  --auth-warm-gray: #817d73;
+  --auth-serif: Georgia, 'Times New Roman', serif;
+  --auth-display: clamp(48px, 5.1vw, 80px);
+  --auth-heading: 40px;
+  --auth-field: 48px;
+  --auth-row: 72px;
+}

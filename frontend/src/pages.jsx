@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useAuthAmbient } from './use-auth-ambient';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowRight,
@@ -10,6 +11,12 @@ import {
   RefreshCw,
   Check,
   Search,
+  Mail,
+  LockKeyhole,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  ShieldCheck,
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth, useData } from './context';
@@ -26,10 +33,13 @@ import {
   formatPercent,
   TopicLink,
   RetryButton,
+  AlgorithmTrace,
 } from './components';
 export function AuthPage() {
+  const ambientPanel = useAuthAmbient();
   const { login } = useAuth(),
     [mode, setMode] = useState('login'),
+    [showPassword, setShowPassword] = useState(false),
     [options, setOptions] = useState([]),
     [demoAccounts, setDemoAccounts] = useState([]),
     [form, setForm] = useState({
@@ -90,7 +100,7 @@ export function AuthPage() {
   };
   return (
     <div className="auth-screen">
-      <section className="auth-story">
+      <section className="auth-story" ref={ambientPanel}>
         <div className="brand">
           <Mark />
           <span>
@@ -98,41 +108,18 @@ export function AuthPage() {
           </span>
         </div>
         <div className="auth-story-content">
+          <p className="auth-eyebrow">LEARN · VISUALISE · BUILD · SOLVE</p>
           <h1>
-            Make the next step
+            From concepts
             <br />
-            make sense.
+            to clarity.
           </h1>
           <p>
-            Connect your syllabus to the decisions inside an algorithm. Understand the idea, predict
-            what follows, and put it into code.
+            Explore algorithms step by step, visualise ideas, and turn complex problems into clear
+            decisions.
           </p>
-          <div className="auth-algorithm" aria-label="Example Binary Search state">
-            <span className="small-label">Binary Search · target8</span>
-            <div className="array-preview">
-              {[2, 4, 6, 8, 10].map((v, i) => (
-                <div key={v} className={i === 2 ? 'current' : ''}>
-                  <strong>{v}</strong>
-                  <span>{i}</span>
-                </div>
-              ))}
-            </div>
-            <div className="example-transition">
-              <span>mid =2</span>
-              <ArrowRight size={18} />
-              <span>6 &lt;8</span>
-              <ArrowRight size={18} />
-              <strong>low =3</strong>
-            </div>
-            <p>The interval changes for a reason. See every one.</p>
-          </div>
-          <div className="auth-courses">
-            <span>Data Structures & Algorithms</span>
-            <span>Artificial Intelligence</span>
-            <span>Database Management Systems</span>
-          </div>
         </div>
-        <p className="auth-footnote">K. K. Wagh · Computer Engineering · 2023 pattern</p>
+        <div className="auth-environment" aria-hidden="true" />
       </section>
       <section className="auth-form-section">
         <form className="auth-form" onSubmit={submit}>
@@ -158,7 +145,7 @@ export function AuthPage() {
               Create student account
             </button>
           </div>
-          <h2>{mode === 'login' ? 'Your learning workspace' : 'Start with your syllabus'}</h2>
+          <h2>{mode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
           <p>
             {mode === 'login'
               ? 'Pick up where your understanding left off.'
@@ -184,31 +171,46 @@ export function AuthPage() {
           )}
           <label>
             Email address
-            <input
-              required
-              type="email"
-              autoComplete="username"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
+            <span className="auth-input">
+              <Mail size={16} aria-hidden="true" />
+              <input
+                required
+                type="email"
+                autoComplete="username"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+              />
+            </span>
           </label>
           <label>
             Password
-            <input
-              type="password"
-              required
-              minLength={mode === 'register' ? 12 : 1}
-              maxLength={64}
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              aria-describedby={mode === 'register' ? 'password-rules' : undefined}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
+            <span className="auth-input">
+              <LockKeyhole size={16} aria-hidden="true" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={mode === 'register' ? 12 : 1}
+                maxLength={64}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                aria-describedby={mode === 'register' ? 'password-rules' : undefined}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </span>
           </label>
           {mode === 'register' && (
             <>
               <p id="password-rules" className="field-help">
-                12–64 characters,at least one letter and one digit;maximum72 UTF-8 bytes.
+                12–64 characters, at least one letter and one digit; maximum 72 UTF-8 bytes.
               </p>
               <label>
                 Academic year
@@ -257,36 +259,47 @@ export function AuthPage() {
           </button>
           {mode === 'login' && demoAccounts.length > 0 && (
             <div className="development-signin">
+              <div className="auth-divider">
+                <span>OR</span>
+              </div>
               <h3>Explore the demo</h3>
               <p className="field-help">
                 Choose a role to sign in instantly. These credentials are for the local demo.
               </p>
               <div className="demo-accounts">
-                {demoAccounts.map((account) => (
-                  <div className="demo-account" key={account.role}>
+                {demoAccounts.map((account) => {
+                  const role = account.role.toUpperCase();
+                  const Icon =
+                    role === 'STUDENT'
+                      ? GraduationCap
+                      : role === 'FACULTY'
+                        ? BookOpen
+                        : ShieldCheck;
+                  const title =
+                    role === 'STUDENT' ? 'student' : role === 'FACULTY' ? 'teacher' : 'admin';
+                  const description =
+                    role === 'STUDENT'
+                      ? 'Solve problems, visualise algorithms.'
+                      : role === 'FACULTY'
+                        ? 'Create and manage content.'
+                        : 'Manage users and system data.';
+                  return (
                     <button
-                      className="button secondary"
+                      className="demo-role"
                       type="button"
+                      key={account.role}
                       disabled={busy}
                       onClick={() => demoSignIn(account)}
                     >
-                      Try as {account.role.toLowerCase()} <ArrowRight size={16} />
+                      <Icon size={18} aria-hidden="true" />
+                      <span>
+                        <strong>Try as {title}</strong>
+                        <small>{description}</small>
+                      </span>
+                      <ArrowRight size={16} aria-hidden="true" />
                     </button>
-                    <p>{account.description}</p>
-                    <dl>
-                      <div>
-                        <dt>Email</dt>
-                        <dd>{account.email}</dd>
-                      </div>
-                      <div>
-                        <dt>Password</dt>
-                        <dd>
-                          <code>{account.password}</code>
-                        </dd>
-                      </div>
-                    </dl>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -308,7 +321,7 @@ export function Overview() {
     <>
       <PageHeading
         title="Learning overview"
-        description="One topic,from the idea to the implementation."
+        description="One topic, from the idea to the implementation."
         action={<RetryButton onClick={() => data.refresh().catch(() => {})} />}
       />
       <div className="overview-layout">
@@ -325,7 +338,7 @@ export function Overview() {
           </div>
           <h3>{topic?.title || 'Explore your curriculum'}</h3>
           <p>
-            {r?.reasonText || 'Choose a topic to connect explanations,simulation and practice.'}
+            {r?.reasonText || 'Choose a topic to connect explanations, simulation and practice.'}
           </p>
           <Link
             className="button primary"
@@ -348,10 +361,11 @@ export function Overview() {
           <div className="continue-evidence">
             <BookOpen size={16} />
             <span>
-              {mapped} mapped topics · {active} with learning resources
+              {mapped} mapped {mapped === 1 ? 'topic' : 'topics'} · {active} with learning resources
             </span>
           </div>
         </div>
+        <AlgorithmTrace />
         <Panel
           title="A complete learning loop"
           description="Each activity records a different kind of evidence."
@@ -409,7 +423,7 @@ export function Overview() {
                 <div>
                   <Link to={`/curriculum?subject=${s.subjectId}`}>{s.title}</Link>
                   <span>
-                    {s.courseCode} · {s.topicCount} topics
+                    {s.courseCode} · {s.topicCount} {s.topicCount === 1 ? 'topic' : 'topics'}
                   </span>
                 </div>
                 <div className="subject-progress-value">
@@ -477,7 +491,7 @@ function StaffOverview() {
     <>
       <PageHeading
         title={user.role === 'ADMIN' ? 'Department overview' : 'Teaching workspace'}
-        description="Curriculum and learning evidence,within your assigned subjects."
+        description="Curriculum and learning evidence, within your assigned subjects."
       />
       <div className="metrics-strip">
         <div>
@@ -510,7 +524,7 @@ function StaffOverview() {
             <GraduationLabel />
             <span>
               <strong>Review student progress</strong>
-              <small>Subject-scoped completion,mastery and outcomes.</small>
+              <small>Subject-scoped completion, mastery and outcomes.</small>
             </span>
             <ArrowUpRight size={16} />
           </Link>
@@ -566,7 +580,7 @@ export function Curriculum({ simulationsOnly = false }) {
         title={simulationsOnly ? 'Simulation lab' : 'Your curriculum'}
         description={
           simulationsOnly
-            ? 'Real algorithmic state,one decision at a time.'
+            ? 'Real algorithmic state, one decision at a time.'
             : 'Source-mapped to SY Semester IV and TY Semester V,2023 pattern.'
         }
         action={
@@ -599,7 +613,9 @@ export function Curriculum({ simulationsOnly = false }) {
             </option>
           ))}
         </select>
-        <span>{visible.length} topics</span>
+        <span>
+          {visible.length} {visible.length === 1 ? 'topic' : 'topics'}
+        </span>
       </div>
       <div className="curriculum-list">
         {subjects
@@ -624,7 +640,7 @@ export function Curriculum({ simulationsOnly = false }) {
                   </div>
                 </div>
                 {groups.map((unit) => {
-                  const isOpen = expanded.has(unit.id) || Boolean(query) || simulationsOnly;
+                  const isOpen = expanded.has(unit.id) || Boolean(query);
                   return (
                     <div className="unit-group" key={unit.id}>
                       <button
@@ -637,7 +653,9 @@ export function Curriculum({ simulationsOnly = false }) {
                           Unit {unit.sortOrder}
                           <strong>{unit.title}</strong>
                         </span>
-                        <span className="unit-count">{unit.items.length} topics</span>
+                        <span className="unit-count">
+                          {unit.items.length} {unit.items.length === 1 ? 'topic' : 'topics'}
+                        </span>
                       </button>
                       {isOpen && (
                         <div className="topic-rows">
@@ -726,46 +744,16 @@ export function ProgressPage() {
       <div className="two-column">
         <Panel
           title="Completion by subject"
-          description="Includes every published enrolled topic,including those not started."
+          description="Includes every published enrolled topic, including those not started."
         >
-          <div className="chart-box">
-            <ResponsiveContainer width="100%" height={210}>
-              <BarChart
-                data={d.subjects}
-                layout="vertical"
-                margin={{ left: 0, right: 24, top: 8, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#edf0f2" />
-                <XAxis
-                  type="number"
-                  domain={[0, 100]}
-                  ticks={[0, 25, 50, 75, 100]}
-                  tickFormatter={(n) => `${n}%`}
-                  tickLine={false}
-                  axisLine={false}
-                  fontSize={12}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="courseCode"
-                  width={65}
-                  axisLine={false}
-                  tickLine={false}
-                  fontSize={12}
-                />
-                <Tooltip
-                  formatter={(v) => formatPercent(v)}
-                  labelFormatter={(code) => d.subjects.find((s) => s.courseCode === code)?.title}
-                />
-                <Bar
-                  dataKey="completionPercent"
-                  name="Completion"
-                  fill="#1b6c80"
-                  barSize={18}
-                  isAnimationActive={false}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+          <div className="subject-bars">
+            {d.subjects.map((s) => (
+              <div className="subject-bar-row" key={s.subjectId}>
+                <span className="mono">{s.courseCode}</span>
+                <ProgressBar value={s.completionPercent} label={s.title} />
+                <span className="num">{formatPercent(s.completionPercent)}</span>
+              </div>
+            ))}
           </div>
         </Panel>
         <Panel title="What the evidence says">
@@ -790,7 +778,33 @@ export function ProgressPage() {
           )}
         </Panel>
       </div>
-      <section className="table-section">
+      <section className="mastery-map">
+        <h2>Topic mastery</h2>
+        <p>Each cell is one topic. Select a topic to review its evidence.</p>
+        <div className="heatmap">
+          {d.topics.map((t) => (
+            <Link
+              key={t.topicId}
+              to={'/topics/' + t.topicId}
+              className={'heat-cell band-' + t.masteryBand.toLowerCase()}
+              aria-label={
+                (byId.get(t.topicId)?.title || t.title) + ': ' + t.masteryBand.toLowerCase()
+              }
+              title={(byId.get(t.topicId)?.title || t.title) + ' · ' + t.masteryBand.toLowerCase()}
+            >
+              {t.masteryBand === 'MASTERED'
+                ? '✓'
+                : t.masteryBand === 'DEVELOPING'
+                  ? '◐'
+                  : t.masteryBand === 'WEAK'
+                    ? '!'
+                    : '·'}
+            </Link>
+          ))}
+        </div>
+        <p className="heat-legend">✓ Mastered · ◐ Developing · ! Weak · · Not enough evidence</p>
+      </section>
+      <section className="table-section evidence-table">
         <div className="section-heading">
           <h2>Topic evidence</h2>
           <select
@@ -807,6 +821,13 @@ export function ProgressPage() {
         </div>
         <div className="table-scroll">
           <table>
+            <colgroup>
+              <col style={{ width: '32%' }} />
+              <col style={{ width: '14%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '16%' }} />
+              <col style={{ width: '22%' }} />
+            </colgroup>
             <thead>
               <tr>
                 <th>Topic</th>
@@ -913,7 +934,7 @@ export function AccountSettings() {
             />
           </label>
           <p className="field-help" id="new-password-help">
-            12–64 characters,at least one letter and one digit;maximum72 UTF-8 bytes.
+            12–64 characters, at least one letter and one digit; maximum 72 UTF-8 bytes.
           </p>
           <button className="button primary" disabled={busy}>
             Change password
@@ -924,7 +945,7 @@ export function AccountSettings() {
         <div>
           <h2>Delete account</h2>
           <p>
-            Access ends immediately. Personal learning records are purged after seven days,by the
+            Access ends immediately. Personal learning records are purged after seven days, by the
             eighth day. This cannot be undone.
           </p>
         </div>
@@ -937,7 +958,7 @@ export function AccountSettings() {
             <>
               <p>
                 Delete the account for <strong>{user.email}</strong>? Enter your current password
-                above,then confirm.
+                above, then confirm.
               </p>
               <button
                 className="button danger"

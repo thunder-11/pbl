@@ -1,3 +1,4 @@
+import { profileRoutes } from './student-profile.js';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -190,6 +191,7 @@ export function createApp({ disableRateLimits = false } = {}) {
   const student = allowRoles('STUDENT'),
     staff = allowRoles('FACULTY', 'ADMIN'),
     admin = allowRoles('ADMIN');
+  profileRoutes(router, send, student);
   const paged = (req, res, rows, filters, sorts, convert = publicDoc) => {
     const p = pagination(req.query, filters, sorts),
       v = listResult(rows, p);

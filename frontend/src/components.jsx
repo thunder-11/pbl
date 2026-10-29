@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -15,6 +15,7 @@ import {
   Search,
   ArrowUpRight,
   ChevronRight,
+  ChevronDown,
   RefreshCw,
   Check,
 } from 'lucide-react';
@@ -217,40 +218,11 @@ export function Shell({ children }) {
         <nav aria-label="Main navigation">
           {nav.map(([url, label, Icon]) => (
             <NavLink key={url} to={url} end={url === '/'}>
-              <Icon size={17} />
+              <Icon size={16} />
               <span>{label}</span>
             </NavLink>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <NavLink to="/settings">
-            <SlidersHorizontal size={17} />
-            Account settings
-          </NavLink>
-          <button onClick={() => logout().catch(() => {})}>
-            <LogOut size={17} />
-            Sign out
-          </button>
-          <div className="person-row">
-            <span className="avatar">
-              {user.displayName
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .slice(0, 2)}
-            </span>
-            <div>
-              <strong>{user.displayName}</strong>
-              <span>
-                {user.role === 'STUDENT'
-                  ? `${user.academicYear} student`
-                  : user.role === 'ADMIN'
-                    ? 'Administrator'
-                    : 'Faculty'}
-              </span>
-            </div>
-          </div>
-        </div>
       </aside>
       <div className="main-area">
         <div className="topbar">
@@ -278,7 +250,7 @@ export function Shell({ children }) {
             />
             <kbd>Ctrl K</kbd>
           </form>
-          <span className="scope-note">Understand. Predict. Implement.</span>
+          <AccountMenu />
         </div>
         <main id="main" className="sheet" key={location.pathname}>
           {loading ? (
@@ -300,6 +272,95 @@ export function Shell({ children }) {
     </div>
   );
 }
+function AccountMenu() {
+  const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const container = useRef(null),
+    trigger = useRef(null);
+  const location = useLocation();
+  useEffect(() => setOpen(false), [location.pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const dismiss = (e) => {
+      if (!container.current?.contains(e.target)) setOpen(false);
+    };
+    const escape = (e) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+        trigger.current?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', dismiss);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', dismiss);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open]);
+  const initials = user.displayName
+    .trim()
+    .split(/\s+/)
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+  return (
+    <div
+      className="account-menu"
+      ref={container}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false);
+      }}
+    >
+      <button
+        ref={trigger}
+        type="button"
+        className="account-trigger"
+        aria-label="Open account menu"
+        aria-expanded={open}
+        aria-controls="account-dropdown"
+        onClick={() => setOpen(!open)}
+      >
+        <span className="avatar" aria-hidden="true">
+          {initials}
+        </span>
+        <span className="account-trigger-name">{user.displayName}</span>
+        <ChevronDown size={16} aria-hidden="true" />
+      </button>
+      {open && (
+        <div className="account-dropdown" id="account-dropdown">
+          <div className="account-summary">
+            <strong>{user.displayName}</strong>
+            <span>{user.email}</span>
+          </div>
+          <nav aria-label="Your account">
+            {user.role === 'STUDENT' && (
+              <Link to="/profile" onClick={() => setOpen(false)}>
+                <UsersRound size={16} />
+                Student profile
+              </Link>
+            )}
+            <Link to="/settings" onClick={() => setOpen(false)}>
+              <SlidersHorizontal size={16} />
+              Account settings
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                logout().catch(() => {});
+              }}
+            >
+              <LogOut size={16} />
+              Sign out
+            </button>
+          </nav>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function Breadcrumbs({ topic }) {
   const { ancestry } = useData();
   return (
@@ -319,5 +380,39 @@ export function RetryButton({ onClick }) {
       <RefreshCw size={15} />
       Refresh
     </button>
+  );
+}
+
+export function AlgorithmTrace() {
+  const [step, setStep] = useState(0);
+  const states = [
+    { low: 0, high: 4, mid: 2, decision: '6 < 8 → low = 3' },
+    { low: 3, high: 4, mid: 3, decision: '8 = 8 → target found at index 3' },
+  ];
+  const s = states[step];
+  return (
+    <section className="algorithm-trace" aria-label="Binary search trace">
+      <header>
+        <h2>Binary Search</h2>
+        <span className="mono">target = 8</span>
+      </header>
+      <div className="trace-cells">
+        {[2, 4, 6, 8, 10].map((v, i) => (
+          <div key={v} className={i === s.mid ? 'trace-cell current' : 'trace-cell'}>
+            <span className="trace-pointer">
+              {i === s.mid ? 'mid' : i === s.low ? 'low' : i === s.high ? 'high' : '—'}
+            </span>
+            <strong>{v}</strong>
+            <span>{i}</span>
+          </div>
+        ))}
+      </div>
+      <div className="trace-decision" aria-live="polite">
+        <code>{s.decision}</code>
+        <button type="button" className="text-button" onClick={() => setStep(step === 0 ? 1 : 0)}>
+          {step === 0 ? 'Next step' : 'Reset trace'}
+        </button>
+      </div>
+    </section>
   );
 }

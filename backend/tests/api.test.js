@@ -766,7 +766,78 @@ test('Faculty can author and publish a resource revision without altering earlie
   assert.equal((await M.learningResources.findById(previous._id)).status, 'ARCHIVED');
   assert.equal((await M.learningResources.findById(previous._id)).content, previous.content);
 });
+test('Degree profile persists validated owner details and keeps evidence beyond one year', async () => {
+  const url = '/users/me/student-profile';
+  assert.equal((await request(app).get('/api/v1' + url)).status, 401);
+  assert.equal((await auth('get', url, faculty)).status, 403);
+  const before = (await auth('get', url)).body.data;
+  assert.equal(before.user.id, String(seedId('student-a')));
+  assert.equal(before.user.passwordHash, undefined);
+  const body = {
+    displayName: before.user.displayName,
+    institution: 'Engineering College',
+    degree: 'BE Computer Engineering',
+    studentNumber: 'CE-2026-17',
+    admissionYear: 2026,
+    graduationYear: 2030,
+    stage: 'FY',
+    bio: 'Learning systems programming.',
+    goals: 'Build a compiler.',
+    projects: [
+      { title: 'Compiler', description: 'Course project', url: 'https://example.org/compiler' },
+    ],
+  };
+  const saved = await auth('patch', url).send(body);
+  assert.equal(saved.status, 200);
+  assert.equal(saved.body.data.details.studentNumber, body.studentNumber);
+  assert.equal((await auth('get', url)).body.data.details.goals, body.goals);
+  assert.notEqual(
+    (await auth('get', url, other)).body.data.details.studentNumber,
+    body.studentNumber,
+  );
+  assert.equal(
+    (await auth('patch', url).send({ ...body, userId: String(seedId('student-b')) })).status,
+    422,
+  );
+  assert.equal((await auth('patch', url).send({ ...body, graduationYear: 2020 })).status, 422);
+  assert.equal(
+    (
+      await auth('patch', url).send({
+        ...body,
+        projects: [{ title: 'Unsafe', url: 'javascript:alert(1)' }],
+      })
+    ).status,
+    422,
+  );
+  const attempt = await M.assessmentAttempts.findOne({ userId: seedId('student-a') });
+  assert.ok(attempt);
+  const original = attempt.createdAt;
+  const old = new Date(Date.now() - 800 * 86400000);
+  await M.assessmentAttempts.collection.updateOne(
+    { _id: attempt._id },
+    { $set: { createdAt: old } },
+    { timestamps: false },
+  );
+  await cleanup();
+  assert.ok(await M.assessmentAttempts.findById(attempt._id));
+  const history = (await auth('get', url)).body.data;
+  assert.ok(history.years.some((y) => y.year === old.getUTCFullYear() && y.assessmentAttempts > 0));
+  assert.equal(
+    history.totals.assessmentAttempts,
+    await M.assessmentAttempts.countDocuments({ userId: seedId('student-a') }),
+  );
+  await M.assessmentAttempts.collection.updateOne(
+    { _id: attempt._id },
+    { $set: { createdAt: original } },
+    { timestamps: false },
+  );
+});
+
 test('Deletion revokes access then purges learner data and anonymizes the author stub', async () => {
+  await M.users.updateOne(
+    { _id: seedId('student-c') },
+    { $set: { 'studentProfile.bio': 'Personal biography' } },
+  );
   const who = token('student-c'),
     r = await auth('post', '/users/me/deletion', who).send({ currentPassword: pwd });
   assert.equal(r.status, 200);
@@ -778,6 +849,7 @@ test('Deletion revokes access then purges learner data and anonymizes the author
   await cleanup();
   const user = await M.users.findById(seedId('student-c'));
   assert.equal(user.status, 'ANONYMIZED');
+  assert.ok(!user.studentProfile?.bio);
   assert.equal(user.email, `${user._id}@deleted.invalid`);
   assert.equal(await M.topicProgress.countDocuments({ userId: user._id }), 0);
 });
